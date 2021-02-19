@@ -1,1 +1,1 @@
-print('Hi, mate! Lets play a game.')
+print('Hi, mate! This string has came from docker container!.')
