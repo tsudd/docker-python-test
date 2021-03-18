@@ -1,0 +1,29 @@
+#!usr/bin/python3
+import argparse
+
+parser = argparse.ArgumentParser(description="Custom serializer by tsudd.")
+parser.add_argument(
+    'path',
+    type=str,
+    help='Provide path to file'
+)
+parser.add_argument(
+    'extension',
+    type=str,
+    default='json',
+    help='Provide target extension to convert.'
+)
+parser.add_argument(
+    '-c',
+    '--config',
+    type=str,
+    default=None,
+    help='Optional parameter to provide conversion config'
+)
+
+namespace = parser.parse_args()
+
+
+
+
+print(namespace.path)
