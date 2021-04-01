@@ -12,6 +12,13 @@ JSON_TRUE = "true"
 JSON_FALSE = "false"
 JSON_NAN = "null"
 
+FIELDS_SEPARATOR = ","
+FIELDS_VALUE_SEPARATOR = ":"
+OBJECT_START = "{"
+OBJECT_END = "}"
+ARRAY_START = "["
+ARRAY_END = "]"
+
 
 class BadJSONException(Exception, BaseException):
     def __init__(self, message=None):
@@ -29,43 +36,42 @@ def dump(obj, fp):
     s = dumps(obj)
 
     fp.write(s)
-    fp.close()
 
 
 def dumps(obj):
-    def dump_complex(obj):
+    def dump_complex(complex_obj):
         ans = ""
-        tp = type(obj)
+        tp = type(complex_obj)
         if tp == dict:
-            ans += "{ "
-            for name, o in obj.items():
+            ans += f"{OBJECT_START} "
+            for name, o in complex_obj.items():
                 ans += f"\"{name}\": "
                 ans += dump_obj(o)
-                if list(obj.keys())[-1] != name:
-                    ans += ", "
-            ans += " }"
+                if list(complex_obj.keys())[-1] != name:
+                    ans += f"{FIELDS_SEPARATOR} "
+            ans += f" {OBJECT_END}"
         elif tp == list or tp == tuple:
             ans += "[ "
-            for o in obj:
+            for o in complex_obj:
                 ans += dump_obj(o)
-                if o != obj[-1]:
-                    ans += ", "
+                if o != complex_obj[-1]:
+                    ans += f"{FIELDS_SEPARATOR} "
             ans += " ]"
         else:
-            ans += "{ "
-            ans += "\"class\": " + "\"" + re.search(CLASS_TYPE_REGEX, str(tp)).group(1) + "\", "
-            fields = dir(obj)
-            ans += "\"fields\": ["
+            ans += f"{OBJECT_START} "
+            ans += "\"class\": " + "\"" + re.search(CLASS_TYPE_REGEX, str(tp)).group(1) + f"{FIELDS_SEPARATOR} "
+            fields = dir(complex_obj)
+            ans += f"\"fields\": {OBJECT_START}"
             dumped_fields = {}
             for field in fields:
                 if re.match(META_METHOD, field) is None:
-                    dumped_fields[f"\"{field}\": "] = dump_obj(obj.__getattribute__(field))
+                    dumped_fields[f"\"{field}\": "] = dump_obj(complex_obj.__getattribute__(field))
             if len(dumped_fields) != 0:
                 for name, o in dumped_fields.items():
                     ans += f"{name}{o}"
                     if list(dumped_fields.keys())[-1] != name:
-                        ans += ", "
-            ans += " ]}"
+                        ans += f"{FIELDS_SEPARATOR} "
+            ans += f" {OBJECT_START}{OBJECT_START}"
 
         return ans
 
@@ -89,7 +95,6 @@ def dumps(obj):
         return string
 
     s = dump_complex(obj)
-    print(s)
     return s
 
 
@@ -148,14 +153,14 @@ def loads(s):
                     quotes = False
 
             elif not quotes:
-                if s[ind] == ':':
+                if s[ind] == FIELDS_VALUE_SEPARATOR:
                     is_field = not is_field
                     is_value = not is_value
 
-                elif s[ind] == '[':
+                elif s[ind] == ARRAY_START:
                     value = parse_array(s, ind)
 
-                elif s[ind] == ',' and is_value:
+                elif s[ind] == FIELDS_SEPARATOR and is_value:
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
                     ans[field_name] = value
@@ -170,7 +175,7 @@ def loads(s):
                         raise BadJSONException()
                     value += s[ind]
 
-                elif s[ind] == "{":
+                elif s[ind] == OBJECT_START:
                     if len(value) != 0:
                         raise BadJSONException()
                     ans[field_name] = parse_complex(s, ind)
@@ -179,7 +184,7 @@ def loads(s):
                     is_value = False
                     is_field = True
 
-                elif s[ind] == "}":
+                elif s[ind] == OBJECT_END:
                     if field_name != "":
                         if not value_quotes and isinstance(value, str):
                             value = try_parse(value)
@@ -231,17 +236,17 @@ def loads(s):
                         raise BadJSONException()
                     value += s[ind]
 
-                elif s[ind] == ',':
+                elif s[ind] == FIELDS_VALUE_SEPARATOR:
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
                     ans.append(value)
                     value = ""
                     value_quotes = False
 
-                elif s[ind] == '{':
+                elif s[ind] == OBJECT_START:
                     value = parse_complex(s, ind + 1)
 
-                elif s[ind] == ']':
+                elif s[ind] == ARRAY_END:
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
 
@@ -286,33 +291,11 @@ def loads(s):
         else:
             raise BadJSONException()
 
-    print(ans)  # control
     return ans
 
 
 def solve():
-    # loads(jstring)
-
-    f = open("test.json", "r")
-    strss = f.read()
-    f.close()
-
-    # ssss = json.loads(strss)
-    obj = loads(strss)
-
-    def summ(a, b):
-        return a + b
-
-    summ.__setattr__("nice", solve)
-    summ.__setattr__("gogo", 229)
-    summ.__setattr__("yo", None)
-
-    go = []
-    go.append(summ)
-    go.append(summ)
-    go.append(summ)
-
-    s = dumps(go)
+    pass
 
 
 if __name__ == '__main__':
