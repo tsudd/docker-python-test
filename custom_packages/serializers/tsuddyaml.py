@@ -1,5 +1,6 @@
 import yaml
 import re
+import inspect
 
 CLASS_TYPE_REGEX = "\'([\w\W]+)\'"
 META_METHOD = "__[\w]+__"
@@ -88,22 +89,25 @@ YAML_NONE = "None"
 #     return 228
 
 def dump(obj, fp):
-    pass
+    s = dumps(obj)
+
+    fp.write(s)
 
 
 def dumps(obj):
     def dump_complex(o):
         ans = ""
         tp = type(o)
-        if tp == dict or tp == tuple or tp == list:
-            ans += yaml.dump(o)
-        else:
-            ans += f"{COMPLEX_OBJECT_NAME}{NAME_OBJECT_MATCHER}{TAB_LITERAL}"
-            fields = dir(o)
-            ans += f"{TYPE_FIELD_NAME}{NAME_VALUE_MATCHER}{re.search(CLASS_TYPE_REGEX, str(tp)).group(1)}\n"
-            for field in fields:
-                if re.match(META_METHOD, field) is None:
-                    ans += f"{TAB_LITERAL}{field}{NAME_VALUE_MATCHER}" + dump_obj(o.__getattribute__(field)) + "\n"
+        ans = yaml.dump(o)
+        # if tp == dict or tp == tuple or tp == list:
+        #     ans += yaml.dump(o)
+        # else:
+        #     # ans += f"{COMPLEX_OBJECT_NAME}{NAME_OBJECT_MATCHER}{TAB_LITERAL}"
+        #     # fields = dir(o)
+        #     # ans += f"{TYPE_FIELD_NAME}{NAME_VALUE_MATCHER}{re.search(CLASS_TYPE_REGEX, str(tp)).group(1)}\n"
+        #     # for field in fields:
+        #     #     if re.match(META_METHOD, field) is None:
+        #     #         ans += f"{TAB_LITERAL}{field}{NAME_VALUE_MATCHER}" + dump_obj(o.__getattribute__(field)) + "\n"
 
         return ans
 
@@ -146,8 +150,11 @@ def solve():
     sum.__setattr__("nice", solve)
     sum.__setattr__("num", 228)
 
-    print(dumps(sum))
-    print(yaml.dump(sum))
+    # print(dumps(sum))
+    # print(yaml.dump(sum))
+    ass = {"cool": [228, "nice", None], "gogo": {"good": "boy", "nice": 229, "dont": {"lol": 20.9}}, "hi": sum}
+    oo = dumps(ass)
+    print(loads(oo))
 
 
 if __name__ == "__main__":
