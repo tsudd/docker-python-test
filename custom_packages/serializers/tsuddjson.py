@@ -59,19 +59,9 @@ def dumps(obj):
             ans += " ]"
         else:
             ans += f"{OBJECT_START} "
-            ans += "\"class\": " + "\"" + re.search(CLASS_TYPE_REGEX, str(tp)).group(1) + f"{FIELDS_SEPARATOR} "
+            ans += f"\"\": " + "\"" + re.search(CLASS_TYPE_REGEX, str(tp)).group(1) + f"{FIELDS_SEPARATOR} "
             fields = dir(complex_obj)
-            ans += f"\"fields\": {OBJECT_START}"
-            dumped_fields = {}
-            for field in fields:
-                if re.match(META_METHOD, field) is None:
-                    dumped_fields[f"\"{field}\": "] = dump_obj(complex_obj.__getattribute__(field))
-            if len(dumped_fields) != 0:
-                for name, o in dumped_fields.items():
-                    ans += f"{name}{o}"
-                    if list(dumped_fields.keys())[-1] != name:
-                        ans += f"{FIELDS_SEPARATOR} "
-            ans += f" {OBJECT_START}{OBJECT_START}"
+
 
         return ans
 
