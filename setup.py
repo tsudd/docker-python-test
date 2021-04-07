@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name='serializer',
-    packages=['lib', 'lib/serializer', 'lib/parser_factory'],
+    packages=['serilizer_lib', 'serilizer_lib/serializer', 'serilizer_lib/parser_factory'],
     version='0.1.0',
     description='Custom serializer by tsudd',
     author='tsudd',

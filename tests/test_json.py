@@ -1,4 +1,4 @@
-from lib.parsers.json import tsuddjson
+from serilizer_lib.parsers.json import tsuddjson
 
 DICT_RESULT = "{\'sosediOptions\': {\'marke\\\\\":tName\': \'Sosedi\', \'goodsURL\': \'https://sosedi.by/sales/\'," \
               " \'goodFields\': {\'pri    ce     \': True, \'priceBack\': \'priceBack\', \'sale\':" \

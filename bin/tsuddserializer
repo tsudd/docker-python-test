@@ -1,6 +1,6 @@
 #!usr/bin/python3
 import argparse
-from lib.parser_factory.factory import ParserFactory
+from serilizer_lib.parser_factory.factory import ParserFactory
 
 DEFAULT_FILE_NAME = "Converted-data"
 
