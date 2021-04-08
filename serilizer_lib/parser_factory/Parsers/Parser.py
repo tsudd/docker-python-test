@@ -1,10 +1,18 @@
 from abc import ABC, abstractmethod
+from serilizer_lib.serializer.Serializer import Serializer
 
 
 class Parser(ABC):
     """
     Abstract class of a parser, which has all necessary methods to process different data formats.
     """
+
+    def __init__(self):
+        self.serializer = Serializer()
+
+    def set_serializer(self, new_serializer: Serializer):
+        self.serializer = new_serializer
+
     @abstractmethod
     def dump(self, obj, fp):
         """

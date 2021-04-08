@@ -4,29 +4,33 @@ import serilizer_lib.parsers.json.tsuddjson as custom_json
 
 class JSONParser(Parser):
     """
-        Parsers for ".json" format, which uses custom library.
+        Parser for ".json" format, which uses custom library.
     """
 
     def dump(self, obj, fp):
         """
         Classic dump to serialize object and put the result to file.
         """
-        return custom_json.dump(obj, fp)
+        simple = self.serializer.serialize_obj(obj)
+        return custom_json.dump(simple, fp)
 
     def dumps(self, obj):
         """
         Returns string with serialized object.
         """
-        return custom_json.dumps(obj)
+        simple = self.serializer.serialize_obj(obj)
+        return custom_json.dumps(simple)
 
     def load(self, fp):
         """
         Returns parsed object and data from the file.
         """
-        return custom_json.load(fp)
+        raw_object = custom_json.load(fp)
+        return self.serializer.deserialize_obj(raw_object)
 
     def loads(self, s):
         """
         Returns parsed object and data from the string.
         """
-        return custom_json.loads(s)
+        raw_object = custom_json.loads(s)
+        return self.serializer.deserialize_obj(raw_object)
