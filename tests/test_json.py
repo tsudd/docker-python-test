@@ -49,27 +49,5 @@ def test_loads():
 
 
 def test_dumps():
-
-    class TestClass():
-        test_number = 228
-
-        def write_hello(self):
-            print("Hello, this it test!")
-
-        def sum(self, a, b):
-            return a + b
-
-    inst1 = TestClass()
-    inst2 = TestClass()
-
-    inst2.__setattr__("inst_attr", inst1)
-
-    arr = [inst2, inst1]
-    assert tsuddjson.dumps(arr) == SERIALIZED_OBJECT
-    
-    
-    
-    
-
-
-
+    d = {"cool": ["228", "nice"], "gogo": {"good": True, "nice": 229, "dont": {"lol": 20.9}}, "next": None}
+    assert tsuddjson.dumps(d) == str(d)

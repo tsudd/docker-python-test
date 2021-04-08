@@ -1,22 +1,8 @@
-import code
 import re
 import inspect
 from types import FunctionType, CodeType
 
-FUNCTION_CLASS_NAME = "function"
-FUNCTION_ATTRS_NAMES = [
-    "__code__",
-    "__name__",
-    "__defaults__",
-    "__closure__",
-]
-
-CODE_FIELD_NAME = "__code__"
-
-TYPE_FIELD_NAME = "TYPE"
-VALUE_FIELD_NAME = "VALUE"
-
-CLASS_TYPE_REGEX = "\'([\w\W]+)\'"
+from serilizer_lib.serializer.serilization.serilization_config import *
 
 
 def serialize_obj(obj):
@@ -77,37 +63,37 @@ def deserialize_obj(obj: dict):
 def get_inst_with_name(typ: str, val):
     if typ == "tuple":
         return tuple(val)
+    elif typ == "function":
+        return deserialize_function(val)
     else:
         return deserialize_obj(val)
 
 
 def deserialize_function(f: dict):
-    details = []
-    fields = f[VALUE_FIELD_NAME]
-    details.append(CodeType(
-        fields[CODE_FIELD_NAME]['VALUE']['co_argcount'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_posonlyargcount'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_kwonlyargcount'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_nlocals'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_stacksize'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_flags'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_code'],
-        tuple(fields[CODE_FIELD_NAME]['VALUE']['co_consts']['VALUE']),
-        tuple(fields[CODE_FIELD_NAME]['VALUE']['co_names']['VALUE']),
-        tuple(fields[CODE_FIELD_NAME]['VALUE']['co_varnames']['VALUE']),
-        fields[CODE_FIELD_NAME]['VALUE']['co_filename'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_name'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_firstlineno'],
-        fields[CODE_FIELD_NAME]['VALUE']['co_lnotab'],
-        tuple(fields[CODE_FIELD_NAME]['VALUE']['co_freevars']['VALUE']),
-        tuple(fields[CODE_FIELD_NAME]['VALUE']['co_cellvars']['VALUE'])
-    ))
+    details = [CodeType(
+        f[CODE_FIELD_NAME]['VALUE']['co_argcount'],
+        f[CODE_FIELD_NAME]['VALUE']['co_posonlyargcount'],
+        f[CODE_FIELD_NAME]['VALUE']['co_kwonlyargcount'],
+        f[CODE_FIELD_NAME]['VALUE']['co_nlocals'],
+        f[CODE_FIELD_NAME]['VALUE']['co_stacksize'],
+        f[CODE_FIELD_NAME]['VALUE']['co_flags'],
+        f[CODE_FIELD_NAME]['VALUE']['co_code'],
+        tuple(f[CODE_FIELD_NAME]['VALUE']['co_consts']['VALUE']),
+        tuple(f[CODE_FIELD_NAME]['VALUE']['co_names']['VALUE']),
+        tuple(f[CODE_FIELD_NAME]['VALUE']['co_varnames']['VALUE']),
+        f[CODE_FIELD_NAME]['VALUE']['co_filename'],
+        f[CODE_FIELD_NAME]['VALUE']['co_name'],
+        f[CODE_FIELD_NAME]['VALUE']['co_firstlineno'],
+        f[CODE_FIELD_NAME]['VALUE']['co_lnotab'],
+        tuple(f[CODE_FIELD_NAME]['VALUE']['co_freevars']['VALUE']),
+        tuple(f[CODE_FIELD_NAME]['VALUE']['co_cellvars']['VALUE'])
+    )]
     glob = {"__builtins__": __builtins__}
     details.append(glob)
     for attr in FUNCTION_ATTRS_NAMES:
         if attr == CODE_FIELD_NAME:
             continue
-        details.append(deserialize_obj(fields[attr]))
+        details.append(deserialize_obj(f[attr]))
 
     return FunctionType(*details)
 

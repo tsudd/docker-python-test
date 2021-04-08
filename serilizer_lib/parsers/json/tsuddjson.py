@@ -1,18 +1,7 @@
 import re
 
-from json_config import *
-
-
-class BadJSONException(Exception, BaseException):
-    def __init__(self, message=None):
-        super().__init__(self)
-
-        if not message is None:
-            print(message)
-            self.__str__()
-
-    def __str__(self):
-        return "Error while parsing: bad JSON."
+from serilizer_lib.parsers.json.json_config import *
+from serilizer_lib.parsers.json.exceptions import *
 
 
 def dump(obj, fp):
@@ -45,7 +34,6 @@ def dumps(obj):
             ans += f"\"\": " + "\"" + re.search(CLASS_TYPE_REGEX, str(tp)).group(1) + f"{FIELDS_SEPARATOR} "
             fields = dir(complex_obj)
 
-
         return ans
 
     def dump_obj(o):
@@ -74,23 +62,19 @@ def dumps(obj):
 def load(fp):
     if fp.encoding != FILE_ENCODING:
         raise ValueError
-
     s = fp.read()
     fp.close()
-
     return loads(s)
 
 
 def loads(s):
     if not isinstance(s, str):
         raise ValueError
-
     ind = 0
 
     def parse_complex(s, index=-1):
         if not (isinstance(s, str) or isinstance(index, int)):
             raise ValueError
-
         nonlocal ind
         ind = index + 1
         ans = {}
@@ -104,7 +88,6 @@ def loads(s):
             if not quotes and s[ind].isspace():
                 ind += 1
                 continue
-
             if s[ind] == '\"':
                 if is_field and not quotes:
                     if len(field_name) != 0:
@@ -124,15 +107,12 @@ def loads(s):
                     if s[ind - 1] == '\\':
                         value += s[ind]
                     quotes = False
-
             elif not quotes:
                 if s[ind] == FIELDS_VALUE_SEPARATOR:
                     is_field = not is_field
                     is_value = not is_value
-
                 elif s[ind] == ARRAY_START:
                     value = parse_array(s, ind)
-
                 elif s[ind] == FIELDS_SEPARATOR and is_value:
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
@@ -142,12 +122,10 @@ def loads(s):
                     value_quotes = False
                     is_field = True
                     is_value = False
-
                 elif s[ind] == '.' and is_value:
                     if not s[ind + 1].isdigit() or '.' in value:
                         raise BadJSONException()
                     value += s[ind]
-
                 elif s[ind] == OBJECT_START:
                     if len(value) != 0:
                         raise BadJSONException()
@@ -156,26 +134,21 @@ def loads(s):
                     value_quotes = False
                     is_value = False
                     is_field = True
-
                 elif s[ind] == OBJECT_END:
                     if field_name != "":
                         if not value_quotes and isinstance(value, str):
                             value = try_parse(value)
 
                         ans[field_name] = value
-
                     ind += 1
                     break
                 elif is_value:
                     value += s[ind]
-
             elif is_field:
                 field_name += s[ind]
             elif is_value:
                 value += s[ind]
-
             ind += 1
-
         return ans
 
     def parse_array(s, index=-1):
@@ -192,7 +165,6 @@ def loads(s):
             if not quotes and s[ind].isspace():
                 ind += 1
                 continue
-
             if s[ind] == '\"':
                 if not quotes:
                     if len(value) != 0:
@@ -201,35 +173,28 @@ def loads(s):
                     value_quotes = True
                 elif quotes:
                     quotes = False
-
             elif not quotes:
-
                 if s[ind] == '.':
                     if not s[ind + 1].isdigit() or '.' in value:
                         raise BadJSONException()
                     value += s[ind]
-
                 elif s[ind] == FIELDS_VALUE_SEPARATOR:
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
                     ans.append(value)
                     value = ""
                     value_quotes = False
-
                 elif s[ind] == OBJECT_START:
                     value = parse_complex(s, ind + 1)
-
                 elif s[ind] == ARRAY_END:
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
-
                     ans.append(value)
                     break
                 else:
                     value += s[ind]
             else:
                 value += s[ind]
-
             ind += 1
 
         return ans

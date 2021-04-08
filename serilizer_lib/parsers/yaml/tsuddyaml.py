@@ -1,5 +1,5 @@
 import yaml
-from yaml_config import *
+from serilizer_lib.parsers.yaml.yaml_config import *
 
 #own parser
 # def dumps(s):

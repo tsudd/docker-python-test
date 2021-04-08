@@ -1,10 +1,13 @@
 #!usr/bin/python3
 import argparse
 from serilizer_lib.parser_factory.factory import ParserFactory
+import logging
 
 DEFAULT_FILE_NAME = "Converted-data"
 
 SAME_EXTENSION_ERROR = "Inputted file and target extension are the same."
+
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 uargs = argparse.ArgumentParser(description="Custom serializer by tsudd.")
 uargs.add_argument(
@@ -43,7 +46,7 @@ def try_get_parser(ext: str):
     try:
         parser = ParserFactory.get_parser(ext)
     except ValueError:
-        print("Wrong target extension. Please, use YAML, TOML or JSON.")
+        logging.error("Wrong target extension. Please, use YAML, TOML or JSON.")
     finally:
         return parser
 
@@ -53,7 +56,7 @@ def parse_file(path: str):
     try:
         fp = open(path, "r")
     except FileNotFoundError:
-        print(f"Error while opening {path}. There is no such file.")
+        logging.error(f"Error while opening {path}. There is no such file.")
         return
 
     parser = try_get_parser(file_ext)
@@ -64,7 +67,7 @@ def parse_file(path: str):
     try:
         obj = parser.load(fp)
     except Exception as ex:
-        print(ex)
+        logging.error(ex)
 
     fp.close()
     return obj
@@ -80,7 +83,7 @@ def serialize(obj, ext: str, file_name=DEFAULT_FILE_NAME):
     try:
         parser.dump(obj, fp)
     except Exception as ex:
-        print(ex)
+        logging.error(ex)
         fp.close()
         return
     fp.close()
@@ -88,7 +91,7 @@ def serialize(obj, ext: str, file_name=DEFAULT_FILE_NAME):
 
 def make_conversion(path: str, ext: str, file_name=DEFAULT_FILE_NAME):
     if get_ext(path).lower() == ext.lower():
-        print("Inputted file's format same as inputted target extension.")
+        logging.error("Inputted file's format same as inputted target extension.")
         return
     obj = parse_file(path)
     if obj is None:
@@ -97,8 +100,8 @@ def make_conversion(path: str, ext: str, file_name=DEFAULT_FILE_NAME):
 
 
 np = uargs.parse_args()
-print(f"Starting of conversion.\n Converting {np.path} file to {np.extension} extension.")
+logging.info(f"Starting of conversion.\n Converting {np.path} file to {np.extension} extension.")
 make_conversion(np.path, np.extension, np.name)
-print("Ending of conversion.")
+logging.info("Ending of conversion.")
 
 
