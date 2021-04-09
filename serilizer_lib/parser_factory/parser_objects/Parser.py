@@ -11,6 +11,7 @@ class Parser(ABC):
         self.serializer = Serializer()
 
     def set_serializer(self, new_serializer: Serializer):
+        assert isinstance(new_serializer, Serializer)
         self.serializer = new_serializer
 
     @abstractmethod

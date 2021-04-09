@@ -1,32 +1,36 @@
-from serilizer_lib.parser_factory.Parsers.Parser import Parser
+from serilizer_lib.parser_factory.parser_objects.Parser import Parser
 import serilizer_lib.parsers.yaml.tsuddyaml as custom_yaml
 
 
 class YAMLParser(Parser):
     """
-        Parsers for ".yaml" format, which uses custom library.
+        parser_objects for ".yaml" format, which uses custom library.
     """
 
     def dump(self, obj, fp):
         """
         Classic dump to serialize object and put the result to file.
         """
-        return custom_yaml.dump(obj, fp)
+        simple = self.serializer.serialize_obj(obj)
+        return custom_yaml.dump(simple, fp)
 
     def dumps(self, obj):
         """
         Returns string with serialized object.
         """
-        return custom_yaml.dumps(obj)
+        simple = self.serializer.serialize_obj(obj)
+        return custom_yaml.dumps(simple)
 
     def load(self, fp):
         """
         Returns parsed object and data from the file.
         """
-        return custom_yaml.load(fp)
+        raw_input = custom_yaml.load(fp)
+        return self.serializer.deserialize_obj(raw_input)
 
     def loads(self, s):
         """
         Returns parsed object and data from the string.
         """
-        return custom_yaml.loads(s)
+        raw_input = custom_yaml.loads(s)
+        return self.serializer.deserialize_obj(raw_input)

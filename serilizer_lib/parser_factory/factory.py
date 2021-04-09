@@ -1,6 +1,6 @@
-from serilizer_lib.parser_factory.Parsers.JSONParser.JSONParser import JSONParser
-from serilizer_lib.parser_factory.Parsers.TOMLParser.TOMLParser import TOMLParser
-from serilizer_lib.parser_factory.Parsers.YAMLParser.YAMLParser import YAMLParser
+from serilizer_lib.parser_factory.parser_objects.json.JSONParser import JSONParser
+from serilizer_lib.parser_factory.parser_objects.toml.TOMLParser import TOMLParser
+from serilizer_lib.parser_factory.parser_objects.yaml.YAMLParser import YAMLParser
 
 
 EXTENSIONS = {
@@ -12,7 +12,7 @@ EXTENSIONS = {
 
 class ParserFactory(object):
     """
-    Factory class with pure parser_factory pattern< which creating parsers for specific data formats.
+    Factory class with pure parser_factory pattern< which creating parser_objects for specific data formats.
     """
 
     @staticmethod

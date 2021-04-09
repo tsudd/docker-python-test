@@ -21,7 +21,10 @@ def serialize_obj(obj):
     elif inspect.isroutine(obj):
         result[TYPE_FIELD_NAME] = type_string
         result[VALUE_FIELD_NAME] = serialize_function(obj)
-    elif isinstance(obj, (int, bytes, float, complex, bool, str)) or obj is None:
+    elif tp == bytes:
+        result[TYPE_FIELD_NAME] = type_string
+        result[VALUE_FIELD_NAME] = list(obj)
+    elif isinstance(obj, (int, float, complex, bool, str)) or obj is None:
         return obj
     else:
         result[TYPE_FIELD_NAME] = type_string
@@ -84,24 +87,20 @@ def get_inst_with_name(typ: str, val):
 
 
 def deserialize_function(f: dict):
-    details = [CodeType(
-        f[CODE_FIELD_NAME]['VALUE']['co_argcount'],
-        f[CODE_FIELD_NAME]['VALUE']['co_posonlyargcount'],
-        f[CODE_FIELD_NAME]['VALUE']['co_kwonlyargcount'],
-        f[CODE_FIELD_NAME]['VALUE']['co_nlocals'],
-        f[CODE_FIELD_NAME]['VALUE']['co_stacksize'],
-        f[CODE_FIELD_NAME]['VALUE']['co_flags'],
-        f[CODE_FIELD_NAME]['VALUE']['co_code'],
-        tuple(f[CODE_FIELD_NAME]['VALUE']['co_consts']['VALUE']),
-        tuple(f[CODE_FIELD_NAME]['VALUE']['co_names']['VALUE']),
-        tuple(f[CODE_FIELD_NAME]['VALUE']['co_varnames']['VALUE']),
-        f[CODE_FIELD_NAME]['VALUE']['co_filename'],
-        f[CODE_FIELD_NAME]['VALUE']['co_name'],
-        f[CODE_FIELD_NAME]['VALUE']['co_firstlineno'],
-        f[CODE_FIELD_NAME]['VALUE']['co_lnotab'],
-        tuple(f[CODE_FIELD_NAME]['VALUE']['co_freevars']['VALUE']),
-        tuple(f[CODE_FIELD_NAME]['VALUE']['co_cellvars']['VALUE'])
-    )]
+    code_fields = f[CODE_FIELD_NAME][VALUE_FIELD_NAME]
+    code_args = []
+    for field in CODE_OBJECT_ARGS:
+        arg = code_fields[field]
+        if type(arg) == dict:
+            if arg[TYPE_FIELD_NAME] == "bytes":
+                code_args.append(bytes(arg[VALUE_FIELD_NAME]))
+            else:
+                code_args.append(tuple(arg[VALUE_FIELD_NAME]))
+        else:
+            code_args.append(arg)
+
+    details = [CodeType(*code_args)]
+
     glob = {"__builtins__": __builtins__}
     for name, o in f[GLOBAL_FIELD_NAME].items():
         glob[name] = deserialize_obj(o)
@@ -110,9 +109,4 @@ def deserialize_function(f: dict):
         if attr == CODE_FIELD_NAME:
             continue
         details.append(deserialize_obj(f[attr]))
-
     return FunctionType(*details)
-
-
-# def deserialize_inst(obj: dict):
-

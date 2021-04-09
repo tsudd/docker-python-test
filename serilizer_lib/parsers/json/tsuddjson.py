@@ -24,16 +24,11 @@ def dumps(obj):
             ans += f" {OBJECT_END}"
         elif tp == list or tp == tuple:
             ans += "[ "
-            for o in complex_obj:
-                ans += dump_obj(o)
-                if o != complex_obj[-1]:
+            for i in range(len(complex_obj)):
+                ans += dump_obj(complex_obj[i])
+                if i != len(complex_obj) - 1:
                     ans += f"{FIELDS_SEPARATOR} "
             ans += " ]"
-        else:
-            ans += f"{OBJECT_START} "
-            ans += f"\"\": " + "\"" + re.search(CLASS_TYPE_REGEX, str(tp)).group(1) + f"{FIELDS_SEPARATOR} "
-            fields = dir(complex_obj)
-
         return ans
 
     def dump_obj(o):
@@ -46,7 +41,7 @@ def dumps(obj):
                 string += JSON_FALSE
         elif o is None:
             string += JSON_NAN
-        elif tp == int or tp == float:
+        elif isinstance(o, (int, bytes, float, complex)):
             string += str(o)
         elif tp != str:
             string += dump_complex(o)
@@ -68,13 +63,11 @@ def load(fp):
 
 
 def loads(s):
-    if not isinstance(s, str):
-        raise ValueError
+    assert not isinstance(s, str)
     ind = 0
 
     def parse_complex(s, index=-1):
-        if not (isinstance(s, str) or isinstance(index, int)):
-            raise ValueError
+        assert not (isinstance(s, str) or isinstance(index, int))
         nonlocal ind
         ind = index + 1
         ans = {}
@@ -152,8 +145,7 @@ def loads(s):
         return ans
 
     def parse_array(s, index=-1):
-        if not (isinstance(s, str) or isinstance(index, int)):
-            raise ValueError
+        assert not (isinstance(s, str) or isinstance(index, int))
 
         nonlocal ind
         ind = index + 1
@@ -162,6 +154,7 @@ def loads(s):
         quotes = False
         value_quotes = False
         while ind < len(s):
+            ch = s[ind]
             if not quotes and s[ind].isspace():
                 ind += 1
                 continue
@@ -178,7 +171,7 @@ def loads(s):
                     if not s[ind + 1].isdigit() or '.' in value:
                         raise BadJSONException()
                     value += s[ind]
-                elif s[ind] == FIELDS_VALUE_SEPARATOR:
+                elif s[ind] == FIELDS_SEPARATOR:
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
                     ans.append(value)
@@ -187,6 +180,8 @@ def loads(s):
                 elif s[ind] == OBJECT_START:
                     value = parse_complex(s, ind + 1)
                 elif s[ind] == ARRAY_END:
+                    if value == "":
+                        return ans
                     if not value_quotes and isinstance(value, str):
                         value = try_parse(value)
                     ans.append(value)
@@ -202,19 +197,20 @@ def loads(s):
     def try_parse(value):
         val = ""
 
-        try:
-            if value == JSON_FALSE:
-                val = False
-            elif value == JSON_TRUE:
-                val = True
-            elif value == JSON_NAN:
-                val = None
-            elif isinstance(value, str) and value.isnumeric():
+        if value == JSON_FALSE:
+            val = False
+        elif value == JSON_TRUE:
+            val = True
+        elif value == JSON_NAN:
+            val = None
+        else:
+            try:
                 val = int(value)
-            else:
-                val = float(value)
-        except Exception:
-            raise BadJSONException()
+            except ValueError:
+                try:
+                    val = float(value)
+                except ValueError:
+                    return val
 
         return val
 

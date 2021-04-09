@@ -1,4 +1,4 @@
-from serilizer_lib.parser_factory.Parsers.Parser import Parser
+from serilizer_lib.parser_factory.parser_objects.Parser import Parser
 import serilizer_lib.parsers.json.tsuddjson as custom_json
 
 
