@@ -63,11 +63,11 @@ def load(fp):
 
 
 def loads(s):
-    assert not isinstance(s, str)
+    assert isinstance(s, str)
     ind = 0
 
     def parse_complex(s, index=-1):
-        assert not (isinstance(s, str) or isinstance(index, int))
+        assert (isinstance(s, str) or isinstance(index, int))
         nonlocal ind
         ind = index + 1
         ans = {}
@@ -145,7 +145,7 @@ def loads(s):
         return ans
 
     def parse_array(s, index=-1):
-        assert not (isinstance(s, str) or isinstance(index, int))
+        assert (isinstance(s, str) or isinstance(index, int))
 
         nonlocal ind
         ind = index + 1

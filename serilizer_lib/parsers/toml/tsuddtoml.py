@@ -47,36 +47,8 @@ def replace_values(d: dict, comp_obj=None, repl_obj=NULL_STRING):
                 d[name] = repl_obj
 
 
-def print_snth(a):
-    print("nice")
-    b = a * 5
-    return b
 
-
-def sum(a=0, b=0):
-    n = 229
-    print(CONS)
-    n += 327
-    print(n)
-    print_snth(a)
-    return a + b
 
 
 def solve():
-    noce = 99
-
-    # sum.__setattr__("nice", solve)
-    # sum.__setattr__("num", 228)
-    # # print(dumps(sum))
-    # # print(yaml.dump(sum))
-    ass = {"cool": ["228", "nice"], "gogo": {"good": "boy", "nice": 229, "func": sum, "dont": {"lol": 20.9}}}
-    # b = serialize_obj(ass)
-
-    par = TOMLParser()
-    aa = par.dumps(ass)
-    b = sum.__closure__
-    print(b)
-    n = serialize_obj(ass)
-    assss = par.loads(aa)
-    assss["gogo"]["func"](2, 2)
     pass

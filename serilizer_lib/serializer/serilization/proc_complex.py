@@ -34,16 +34,26 @@ def serialize_obj(obj):
 
 
 def serialize_function(f: object):
+    print(f.__name__)
     result = {}
     details = inspect.getmembers(f)
     for detail in details:
+        if inspect.isbuiltin(detail[1]):
+            continue
         if detail[0] in FUNCTION_ATTRS_NAMES:
             result[detail[0]] = serialize_obj(detail[1])
             if detail[0] == CODE_FIELD_NAME:
                 result[GLOBAL_FIELD_NAME] = {}
                 glob = f.__getattribute__(GLOBAL_FIELD_NAME)
                 for name in detail[1].__getattribute__(GLOBALS_NAMES_FIELD):
+                    if name == f.__name__:
+                        result[GLOBAL_FIELD_NAME][name] = f.__name__
+                        continue
+                    if name in glob["__builtins__"]:
+                        continue
                     if name in glob:
+                        if inspect.ismodule(glob[name]):
+                            continue
                         result[GLOBAL_FIELD_NAME][name] = serialize_obj(glob[name])
 
     return result
@@ -98,9 +108,7 @@ def deserialize_function(f: dict):
                 code_args.append(tuple(arg[VALUE_FIELD_NAME]))
         else:
             code_args.append(arg)
-
     details = [CodeType(*code_args)]
-
     glob = {"__builtins__": __builtins__}
     for name, o in f[GLOBAL_FIELD_NAME].items():
         glob[name] = deserialize_obj(o)
@@ -109,4 +117,8 @@ def deserialize_function(f: dict):
         if attr == CODE_FIELD_NAME:
             continue
         details.append(deserialize_obj(f[attr]))
-    return FunctionType(*details)
+
+    result_func = FunctionType(*details)
+    if result_func.__name__ in result_func.__getattribute__(GLOBAL_FIELD_NAME):
+        result_func.__getattribute__(GLOBAL_FIELD_NAME)[result_func.__name__] = result_func
+    return result_func
