@@ -15,20 +15,20 @@ def dumps(obj):
         ans = ""
         tp = type(complex_obj)
         if tp == dict:
-            ans += f"{OBJECT_START} "
+            ans += OBJECT_START
             for name, o in complex_obj.items():
                 ans += f"\"{name}\": "
                 ans += dump_obj(o)
                 if list(complex_obj.keys())[-1] != name:
-                    ans += f"{FIELDS_SEPARATOR} "
-            ans += f" {OBJECT_END}"
+                    ans += FIELDS_SEPARATOR + " "
+            ans += OBJECT_END
         elif tp == list or tp == tuple:
-            ans += "[ "
+            ans += ARRAY_START
             for i in range(len(complex_obj)):
                 ans += dump_obj(complex_obj[i])
                 if i != len(complex_obj) - 1:
-                    ans += f"{FIELDS_SEPARATOR} "
-            ans += " ]"
+                    ans += FIELDS_SEPARATOR + " "
+            ans += ARRAY_END
         return ans
 
     def dump_obj(o):
@@ -46,7 +46,7 @@ def dumps(obj):
         elif tp != str:
             string += dump_complex(o)
         else:
-            string += "\"" + str(o) + "\""
+            string += "\"" + str(o).replace("\n", " ") + "\""
 
         return string
 
@@ -81,7 +81,7 @@ def loads(s):
             if not quotes and s[ind].isspace():
                 ind += 1
                 continue
-            if s[ind] == '\"':
+            if s[ind] == '\"' or s[ind] == '\'':
                 if is_field and not quotes:
                     if len(field_name) != 0:
                         raise BadJSONException()
@@ -154,11 +154,10 @@ def loads(s):
         quotes = False
         value_quotes = False
         while ind < len(s):
-            ch = s[ind]
             if not quotes and s[ind].isspace():
                 ind += 1
                 continue
-            if s[ind] == '\"':
+            if s[ind] == '\"' or s[ind] == '\'':
                 if not quotes:
                     if len(value) != 0:
                         raise BadJSONException()
@@ -197,11 +196,11 @@ def loads(s):
     def try_parse(value):
         val = ""
 
-        if value == JSON_FALSE:
+        if value == JSON_FALSE or value == PYTHON_FALSE:
             val = False
-        elif value == JSON_TRUE:
+        elif value == JSON_TRUE or value == PYTHON_TRUE:
             val = True
-        elif value == JSON_NAN:
+        elif value == JSON_NAN or value == PYTHON_NAN:
             val = None
         else:
             try:
@@ -214,18 +213,17 @@ def loads(s):
 
         return val
 
-    match = re.search(GLOBAL_OBJ_REGEX, s.strip())
-    ans = {}
-    if not match is None:
-        ans = parse_complex(match.group(1))
-    else:
-        match = re.search(GLOBAL_ARRAY_REGEX, s.strip())
-        if not match is None:
-            ans = parse_array(match.group(0))
-        else:
-            raise BadJSONException()
+    ans = parse_complex(s)
+    # if not match is None:
+    #     ans = parse_complex(match.group(1))
+    # else:
+    #     match = re.search(GLOBAL_ARRAY_REGEX, s.strip())
+    #     if not match is None:
+    #         ans = parse_array(match.group(0))
+    #     else:
+    #         raise BadJSONException()
 
-    return ans
+    return ans['']
 
 
 def solve():

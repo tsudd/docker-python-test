@@ -34,7 +34,6 @@ def serialize_obj(obj):
 
 
 def serialize_function(f: object):
-    print(f.__name__)
     result = {}
     details = inspect.getmembers(f)
     for detail in details:

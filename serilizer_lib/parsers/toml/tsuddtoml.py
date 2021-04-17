@@ -15,8 +15,9 @@ def dumps(d: dict):
 
 
 def dump(s, fp):
-    s = toml.dumps(s)
-    fp.write(s)
+    replace_values(s, None, NULL_STRING)
+    pp = toml.dumps(s)
+    fp.write(pp)
 
 
 def load(fp):
@@ -46,9 +47,26 @@ def replace_values(d: dict, comp_obj=None, repl_obj=NULL_STRING):
             elif o == comp_obj:
                 d[name] = repl_obj
 
+def sum_two_elements(a=0, b=0):
+    rez = a + b
+    print_equation(a, b, rez)
+    return rez
 
 
+def print_equation(a, b, c):
+    print(f"{a} + {b} = {c}")
+
+
+def dd(a=2, b=3):
+    c = a + b
+    return c
 
 
 def solve():
+    par = JSONParser()
+    fs = open("rez.json", "r")
+    a = dd.__code__
+    b = sum_two_elements.__globals__
+    o = par.loads('{"niceNone": null, "goodnums": [22.6, 33, 2e5], "ohhyes": true, "uegay": false}')
+    fs.close()
     pass

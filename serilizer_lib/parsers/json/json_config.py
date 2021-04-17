@@ -10,6 +10,10 @@ JSON_TRUE = "true"
 JSON_FALSE = "false"
 JSON_NAN = "null"
 
+PYTHON_TRUE = "True"
+PYTHON_FALSE = "False"
+PYTHON_NAN = "None"
+
 FIELDS_SEPARATOR = ","
 FIELDS_VALUE_SEPARATOR = ":"
 OBJECT_START = "{"
