@@ -58,7 +58,6 @@ def load(fp):
     if fp.encoding != FILE_ENCODING:
         raise ValueError
     s = fp.read()
-    fp.close()
     return loads(s)
 
 
@@ -224,11 +223,3 @@ def loads(s):
     #         raise BadJSONException()
 
     return ans['']
-
-
-def solve():
-    pass
-
-
-if __name__ == '__main__':
-    solve()

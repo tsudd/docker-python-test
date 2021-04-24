@@ -1,0 +1,7 @@
+niceNone = '__null__'
+ohhyes = true
+uegay = false
+
+[goodnums]
+TYPE = 'list'
+VALUE = [ 22.6, 33, 200000.0 ]

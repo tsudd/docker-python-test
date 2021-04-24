@@ -1,5 +1,6 @@
 from serilizer_lib.serializer.serilization.proc_complex import serialize_obj, deserialize_obj
 from tests.test_config import sum_two_elements, fib_nums
+import yaml
 
 
 def test_func_serialization():
@@ -18,4 +19,12 @@ def test_recursive_func():
     ser = serialize_obj(fib_nums)
     deser_func = deserialize_obj(ser)
     assert deser_func(10) == fib_nums(10)
+
+
+def test_other_func():
+    fs = open("tests/rez11.yaml", "r")
+    d = yaml.load(fs, Loader=yaml.FullLoader)
+    fs.close()
+    o = deserialize_obj(d)
+    assert o(1, 2) == 225
 

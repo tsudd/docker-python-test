@@ -94,25 +94,6 @@ def dumps(obj):
 
         return ans
 
-    def dump_obj(o):
-        string = ""
-        tp = type(o)
-        if tp == bool:
-            if o:
-                string += YAML_TRUE
-            else:
-                string += YAML_FALSE
-        elif o is None:
-            string += YAML_NONE
-        elif tp == int or tp == float:
-            string += str(o)
-        elif tp != str:
-            string += dump_complex(o)
-        else:
-            string += str(o)
-
-        return string
-
     s = dump_complex(obj)
     return s
 
@@ -123,22 +104,3 @@ def load(fp):
 
 def loads(s):
     return yaml.load(s, Loader=yaml.FullLoader)
-
-
-def solve():
-
-    def sum(a, b):
-        return a + b
-
-    sum.__setattr__("nice", solve)
-    sum.__setattr__("num", 228)
-
-    # print(dumps(sum))
-    # print(yaml.dump(sum))
-    ass = {"cool": [228, "nice", None], "gogo": {"good": "boy", "nice": 229, "dont": {"lol": 20.9}}, "hi": sum}
-    oo = dumps(ass)
-    print(loads(oo))
-
-
-if __name__ == "__main__":
-    solve()

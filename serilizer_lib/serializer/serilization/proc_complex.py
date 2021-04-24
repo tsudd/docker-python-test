@@ -48,7 +48,7 @@ def serialize_function(f: object):
                     if name == f.__name__:
                         result[GLOBAL_FIELD_NAME][name] = f.__name__
                         continue
-                    if name in glob["__builtins__"]:
+                    if name in __builtins__:
                         continue
                     if name in glob:
                         if inspect.ismodule(glob[name]):
@@ -71,19 +71,39 @@ def serialize_inst(inst: object):
 
 
 def deserialize_obj(obj):
-    typ = type(obj)
-    if typ == dict:
-        result = {}
+    # typ = type(obj)
+    # if typ == dict:
+    #     result = {}
+    #     if VALUE_FIELD_NAME in obj and TYPE_FIELD_NAME in obj:
+    #         return get_inst_with_name(obj[TYPE_FIELD_NAME], obj[VALUE_FIELD_NAME])
+    #     for name, o in obj.items():
+    #         tp = type(o)
+    #         if tp == dict:
+    #             result[name] = deserialize_obj(o)
+    #         else:
+    #             result[name] = o
+    #     return result
+    result = {}
+    tp = type(obj)
+
+    if tp == dict:
         if VALUE_FIELD_NAME in obj and TYPE_FIELD_NAME in obj:
             return get_inst_with_name(obj[TYPE_FIELD_NAME], obj[VALUE_FIELD_NAME])
         for name, o in obj.items():
-            tp = type(o)
-            if tp == dict:
-                result[name] = deserialize_obj(o)
-            else:
-                result[name] = o
+            result[name] = deserialize_obj(o)
+    elif tp == list:
+        result = []
+        for o in obj:
+            result.append(deserialize_obj(o))
         return result
-    return obj
+    elif tp == tuple:
+        result = []
+        for o in obj:
+            result.append(deserialize_obj(o))
+        return result
+    else:
+        return obj
+    return result
 
 
 def get_inst_with_name(typ: str, val):
@@ -91,8 +111,9 @@ def get_inst_with_name(typ: str, val):
         return tuple(val)
     elif typ == "function":
         return deserialize_function(val)
-    else:
-        return val
+    elif typ == "bytes":
+        return bytes(val)
+    return val
 
 
 def deserialize_function(f: dict):
@@ -101,10 +122,11 @@ def deserialize_function(f: dict):
     for field in CODE_OBJECT_ARGS:
         arg = code_fields[field]
         if type(arg) == dict:
-            if arg[TYPE_FIELD_NAME] == "bytes":
-                code_args.append(bytes(arg[VALUE_FIELD_NAME]))
-            else:
-                code_args.append(tuple(arg[VALUE_FIELD_NAME]))
+            code_args.append(deserialize_obj(arg))
+            # if arg[TYPE_FIELD_NAME] == "bytes":
+            #     code_args.append(bytes(arg[VALUE_FIELD_NAME]))
+            # else:
+            #     code_args.append(tuple(arg[VALUE_FIELD_NAME]))
         else:
             code_args.append(arg)
     details = [CodeType(*code_args)]

@@ -1,4 +1,5 @@
 from serilizer_lib.parsers.json import tsuddjson
+from serilizer_lib.parsers.json.exceptions import BadJSONException
 from tests.test_config import DATA_DICT, JSON_FILE, DICT_RESULT, PARSED_DICT
 import json
 
@@ -41,3 +42,12 @@ def test_diff_types_load():
 
     assert str(tsuddjson.loads(str(d))) == str(d)
 
+
+def test_exception():
+    bad_string = "{\"hi\" Hello pal!!!\", \"next phrases\": [\"Hi!\", \"Good morning\", \"ok\"]}"
+
+    try:
+        rez = tsuddjson.loads(bad_string)
+        assert 1 == 0
+    except BadJSONException:
+        assert 1 == 1
