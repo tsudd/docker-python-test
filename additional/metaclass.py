@@ -69,12 +69,6 @@ class AnyField:
         self.__value = None
         self.name = None
 
-    def field_checker(self, val):
-        if isinstance(val, self._type):
-            return val
-        else:
-            raise TypeError(f"Expected attr type is {self._type.__name__} but got {type(val)}")
-
     def __get__(self, instance, owner):
         return getattr(instance, self.name, None)
 
